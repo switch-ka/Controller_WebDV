@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -43,7 +42,6 @@ class AuthController extends Controller
     public function logout()
     {
         session()->forget('user_type');
-        return redirect()->route('login'); // Corrected line
+        return redirect()->route('login');
     }
-
 }
