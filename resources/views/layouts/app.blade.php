@@ -42,13 +42,14 @@
         <div class="content">
             <!-- Full-Width Search Bar -->
             <div class="search-container">
-                <form action="{{ route('search-ticket') }}" method="GET" style="display: flex;">
-                    <input type="text" name="search" placeholder="Search by Ticket #" class="search-bar" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px 0 0 4px;">
+                <form action="{{ route('search-ticket') }}" method="GET" style="width: 100%; display: flex;">
+                    <input type="text" name="search" placeholder="Search by Ticket #" class="search-bar" style="width: 100%; flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px 0 0 4px;">
                     <button type="submit" class="search-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
                         Search
                     </button>
                 </form>
             </div>
+
 
 
             <!-- Full-Width Form Container -->
