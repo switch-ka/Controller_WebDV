@@ -42,11 +42,14 @@
         <div class="content">
             <!-- Full-Width Search Bar -->
             <div class="search-container">
-                <input type="text" placeholder="Search..." class="search-bar">
-                <button class="search-button">
-                    <img src="{{ asset('images/search.png') }}" alt="Search Icon" />
-                </button>
+                <form action="{{ route('search-ticket') }}" method="GET" style="display: flex;">
+                    <input type="text" name="search" placeholder="Search by Ticket #" class="search-bar" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px 0 0 4px;">
+                    <button type="submit" class="search-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
+                        Search
+                    </button>
+                </form>
             </div>
+
 
             <!-- Full-Width Form Container -->
             <div class="form-container">
