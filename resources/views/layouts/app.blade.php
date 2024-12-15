@@ -10,7 +10,13 @@
     <div class="wrapper">
         <!-- Sidebar -->
         <div class="sidebar">
-            <h2>{{ session('user_type') == 'admin' ? 'WELCOME ADMIN' : 'WELCOME USER' }}</h2>
+        @if (session('username'))
+    <p>Welcome, {{ session('username') }}</p>
+@else
+    <p>Welcome, Guest</p>
+@endif
+
+
             <ul>
                 @if(session('user_type') == 'admin')
                     <li><a href="{{ route('view-ticket') }}">View Ticket</a></li>
@@ -21,22 +27,11 @@
             </ul>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="logout-btn" style="
-                    background-color: #e74c3c !important;
-                    color: white !important;
-                    width: 100% !important;
-                    padding: 12px !important;
-                    font-size: 16px !important;
-                    text-align: center !important;
-                    border: none !important;
-                    border-radius: 8px !important;
-                    cursor: pointer !important;
-                ">Logout</button>
-
+                <button type="submit" class="logout-btn" style="background-color: #e74c3c !important; color: white !important; width: 100% !important; padding: 12px !important; font-size: 16px !important; text-align: center !important; border: none !important; border-radius: 8px !important; cursor: pointer !important;">
+                    Logout
+                </button>
             </form>
-
         </div>
-
 
         <!-- Content Area -->
         <div class="content">
@@ -49,8 +44,6 @@
                     </button>
                 </form>
             </div>
-
-
 
             <!-- Full-Width Form Container -->
             <div class="form-container">

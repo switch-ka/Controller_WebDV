@@ -15,8 +15,8 @@ Route::get('/create-ticket', [TicketController::class, 'create'])
     ->middleware('role:user');
 
 // Route to handle form submission (store the ticket) - restricted to users with 'user' role
-Route::post('/view-ticet', [TicketController::class, 'store'])
-    ->name('view-ticket')
+Route::post('/store-ticket', [TicketController::class, 'store'])
+    ->name('store-ticket')
     ->middleware('role:user');
 
 // Login routes
@@ -29,9 +29,16 @@ Route::post('/admin/login', [AuthController::class, 'loginAdmin'])->name('admin.
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Route to view all tickets - accessible by both admin and user
 Route::get('/view-ticket', [TicketController::class, 'view'])
     ->name('view-ticket')
     ->middleware('role:admin,user');
 
-    Route::post('/store-ticket', [TicketController::class, 'store'])->name('store-ticket');
-    Route::get('/search', [TicketController::class, 'search'])->name('search-ticket');
+// Route to search tickets - accessible by both admin and user
+Route::get('/search', [TicketController::class, 'search'])->name('search-ticket');
+
+// Route to show the registration form
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+
+// Route to handle form submission (register a new user)
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');

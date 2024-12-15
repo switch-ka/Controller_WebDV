@@ -9,13 +9,13 @@ class CheckUserRole
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        $userType = session('user_type'); // Retrieve the user type from the session
-
-        if (!in_array($userType, $roles)) {
-            // If the user does not have the correct role, redirect to login
+        $userRole = session('user_type');
+    
+        if (!in_array($userRole, $roles)) {
             return redirect()->route('login')->with('error', 'Unauthorized access');
         }
-
+    
         return $next($request);
     }
+    
 }

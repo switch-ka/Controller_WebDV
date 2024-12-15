@@ -42,6 +42,7 @@
                     <input type="password" name="password" placeholder="Password" required>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
+                <a href="{{ route('register') }}">Register as User</a>
                 <button type="submit" class="btn">Login</button>
             </form>
         </div>
@@ -59,6 +60,7 @@
                     <input type="password" name="password" placeholder="Password" required>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
+                <a href="{{ route('register') }}">Register as User</a>
                 <button type="submit" class="btn">Login</button>
             </form>
         </div>

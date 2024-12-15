@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ticket;  // Ensure you have this model
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
@@ -9,7 +10,6 @@ class TicketController extends Controller
     // Other methods...
 
     // Method for admins to view tickets
-
     public function create()
     {
         return view('create-ticket'); // Make sure this view exists
@@ -17,121 +17,40 @@ class TicketController extends Controller
 
     public function view()
     {
- 
-        // Dummy data to simulate tickets
-        $tickets = [
-            [
-                'id' => 1,
-                'title' => 'Sample Ticket 1',
-                'status' => 'open',
-                'description' => 'Description for sample ticket 1',
-            ],
-            [
-                'id' => 2,
-                'title' => 'Sample Ticket 2',
-                'status' => 'closed',
-                'description' => 'Description for sample ticket 2',
-            ],
-            [
-                'id' => 3,
-                'title' => 'Sample Ticket 3',
-                'status' => 'in-progress',
-                'description' => 'Description for sample ticket 3',
-            ],
-            [
-                'id' => 4,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 4 ',
-            ],
-            [
-                'id' => 5,
-                'title' => 'Sample Ticket 3',
-                'status' => 'in-progress',
-                'description' => 'Description for sample ticket 5',
-            ],
-            [
-                'id' => 6,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Closed',
-                'description' => 'Description for sample ticket 6',
-            ],
-            [
-                'id' => 7,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 7',
-            ],
-            [
-                'id' => 8,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 8',
-            ],
-        ];
+        // Retrieve all tickets from the database
+        $tickets = Ticket::all();
 
         return view('view-ticket', compact('tickets'));
+    }
+
+    public function store(Request $request)
+    {
+        // Validation (optional, but recommended)
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+        ]);
+
+        // Create and store the new ticket
+        $ticket = new Ticket();
+        $ticket->title = $request->title;
+        $ticket->status = 'open';  // Default status
+        $ticket->description = $request->description;
+        $ticket->user_id = session('user_id');  // Associate with logged-in user
+        $ticket->save();
+
+        return redirect()->route('view-ticket');
     }
 
     public function search(Request $request)
     {
         $searchTerm = $request->input('search');
-        // Dummy data to simulate tickets
-        $tickets = [
-            [
-                'id' => 1,
-                'title' => 'Sample Ticket 1',
-                'status' => 'open',
-                'description' => 'Description for sample ticket 1',
-            ],
-            [
-                'id' => 2,
-                'title' => 'Sample Ticket 2',
-                'status' => 'closed',
-                'description' => 'Description for sample ticket 2',
-            ],
-            [
-                'id' => 3,
-                'title' => 'Sample Ticket 3',
-                'status' => 'in-progress',
-                'description' => 'Description for sample ticket 3',
-            ],
-            [
-                'id' => 4,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 4 ',
-            ],
-            [
-                'id' => 5,
-                'title' => 'Sample Ticket 3',
-                'status' => 'in-progress',
-                'description' => 'Description for sample ticket 5',
-            ],
-            [
-                'id' => 6,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Closed',
-                'description' => 'Description for sample ticket 6',
-            ],
-            [
-                'id' => 7,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 7',
-            ],
-            [
-                'id' => 8,
-                'title' => 'Sample Ticket 3',
-                'status' => 'Open',
-                'description' => 'Description for sample ticket 8',
-            ],
-        ];
-        // Filter tickets based on the search term
-    $filteredTickets = array_filter($tickets, function ($ticket) use ($searchTerm) {
-        return str_contains((string)$ticket['id'], $searchTerm);
-    });
 
-    return view('view-ticket', ['tickets' => $filteredTickets]);
+        // Search for tickets by title, description, or other attributes
+        $tickets = Ticket::where('title', 'like', "%$searchTerm%")
+                         ->orWhere('description', 'like', "%$searchTerm%")
+                         ->get();
+
+        return view('view-ticket', ['tickets' => $tickets]);
     }
 }
