@@ -19,6 +19,30 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    // Handle Admin registration
+    public function registerAdmin(Request $request)
+{
+    dd($request->all());  // This will dump all the submitted form data
+
+    // Validate incoming data for admin registration
+    $validated = $request->validate([
+        'username' => 'required|unique:users,username',
+        'password' => 'required|min:6',
+        'email' => 'required|email|unique:users,email',
+        'role' => 'required|in:user,admin', // Ensure both user and admin are accepted
+        'admin_key' => 'required_if:role,admin', // Admin key required if role is admin
+    ]);
+
+    // Check if the role is 'admin' and validate the admin key
+    if ($validated['role'] === 'admin' && $validated['admin_key'] !== 'admin_secret_key') {
+        return redirect()->back()->with('error', 'Invalid admin key');
+    }
+
+    // Continue with user creation...
+}
+
+    
+
     // Handle User login
     public function loginUser(Request $request)
     {
@@ -34,11 +58,9 @@ class AuthController extends Controller
         if (!$user || $user->password !== $validated['password']) {
             return back()->with('error', 'Invalid credentials');
         }
-        // Store user information in the session
-    session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
 
-        // Store user ID and role in session
-        session(['user_id' => $user->id, 'user_type' => $user->role]);
+        // Store user information in the session
+        session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
 
         // Redirect user based on their role (user/admin)
         return redirect()->route('view-ticket');
@@ -52,34 +74,57 @@ class AuthController extends Controller
             'username' => 'required|unique:users,username',
             'password' => 'required|min:6',
             'email' => 'required|email|unique:users,email',
+            'role' => 'required|in:user,admin',  // Ensure only user or admin is allowed
+            'admin_key' => 'required_if:role,admin|in:admin_secret_key', // Admin key validation only if role is 'admin'
         ]);
-
+    
+        // If the role is 'admin' and the admin_key is not correct
+        if ($validated['role'] === 'admin' && $validated['admin_key'] !== 'admin_secret_key') {
+            return back()->with('error', 'Invalid admin key');
+        }
+    
         // Create a new user instance
         $user = new User();
         $user->username = $validated['username'];  // Assign username
         $user->password = $validated['password'];  // Use plain text password
-        $user->role = 'user';  // Default role as 'user'
+        $user->role = $validated['role'];  // Assign role (user or admin)
         $user->email = $validated['email'];  // Assign email
         $user->save();  // Save to the database
-
+    
         // Return success message and redirect to login page
         return redirect()->route('login')->with('success', 'User registered successfully!');
     }
+   
+    
 
     // Handle Admin login
     public function loginAdmin(Request $request)
-    {
-        $credentials = $request->only('username', 'password');
+{
+    // Validate the incoming request data
+    $validated = $request->validate([
+        'username' => 'required',
+        'password' => 'required',
+    ]);
 
-        // Check admin credentials manually
-        if ($credentials['username'] === 'admin' && $credentials['password'] === 'adminpassword') {
-            session(['user_type' => 'admin']); // Store admin type in session
-            return redirect()->route('view-ticket'); // Redirect to admin view ticket page
-        }
+    // Fetch the user from the database
+    $user = User::where('username', $validated['username'])->first();
 
-        // Return error if credentials are invalid
-        return redirect()->back()->with('error', 'Invalid username or password');
+    // Check if the user exists and if the password matches
+    if (!$user || $user->password !== $validated['password']) {
+        return redirect()->back()->with('error', 'Invalid credentials');
     }
+
+    // Check if the user has an 'admin' role
+    if ($user->role !== 'admin') {
+        return redirect()->back()->with('error', 'You are not authorized to log in as an admin');
+    }
+
+    // Store user information in the session
+    session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
+
+    // Redirect to the admin's ticketing system or another admin page
+    return redirect()->route('view-ticket');
+}
 
     // Handle logout
     public function logout()

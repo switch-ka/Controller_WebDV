@@ -17,8 +17,14 @@ class TicketController extends Controller
 
     public function view()
     {
-        // Retrieve all tickets from the database
-        $tickets = Ticket::all();
+        // Check if the logged-in user is an admin
+        if (session('user_type') === 'admin') {
+            // If admin, show all tickets
+            $tickets = Ticket::all();
+        } else {
+            // If regular user, show only their tickets
+            $tickets = Ticket::where('user_id', session('user_id'))->get();
+        }
 
         return view('view-ticket', compact('tickets'));
     }

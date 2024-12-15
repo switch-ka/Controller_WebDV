@@ -33,7 +33,41 @@
     <label for="password_confirmation">Confirm Password:</label>
     <input type="password" id="password_confirmation" name="password_confirmation" required>
 
+    <label for="role">Role:</label>
+    <select name="role" id="role" required>
+        <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+    </select>
+
+    @error('role')
+        <div>{{ $message }}</div>
+    @enderror
+
+    <!-- Admin Key container -->
+    <div id="admin-key-container" style="display: none;">
+        <label for="admin_key">Admin Key:</label>
+        <input type="text" id="admin_key" name="admin_key" value="{{ old('admin_key') }}" required>
+
+        @error('admin_key')
+            <div>{{ $message }}</div>
+        @enderror
+    </div>
+
     <button type="submit">Register</button>
 </form>
+
+<script>
+    document.getElementById('role').addEventListener('change', function() {
+        var adminKeyContainer = document.getElementById('admin-key-container');
+        if (this.value === 'admin') {
+            adminKeyContainer.style.display = 'block';
+        } else {
+            adminKeyContainer.style.display = 'none';
+        }
+    });
+
+    // Trigger the event on page load to show the correct admin key field state
+    document.getElementById('role').dispatchEvent(new Event('change'));
+</script>
 </body>
 </html>

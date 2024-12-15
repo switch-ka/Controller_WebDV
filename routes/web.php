@@ -19,6 +19,12 @@ Route::post('/store-ticket', [TicketController::class, 'store'])
     ->name('store-ticket')
     ->middleware('role:user');
 
+    // In routes/web.php
+
+// Route to handle Admin registration form submission
+Route::post('/admin/register', [AuthController::class, 'registerAdmin'])->name('admin.register.submit');
+
+
 // Login routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 
