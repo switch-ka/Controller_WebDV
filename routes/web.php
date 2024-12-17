@@ -3,6 +3,38 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Ticket;
+use App\Models\Comment;
+use Illuminate\Http\Request;
+
+
+
+Route::get('/ticket/{id}', function ($id) {
+    $ticket = Ticket::find($id);
+    if (!$ticket) {
+        return redirect('/tickets')->with('error', 'Ticket not found');
+    }
+    return view('ticket.view', compact('ticket'));
+});
+
+Route::post('/ticket/{id}/comments', function (Request $request, $id) {
+    $request->validate(['content' => 'required']);
+
+    Comment::create([
+        'ticket_id' => $id,
+        'user_id' => auth()->id(), // Admin/User ID
+        'content' => $request->content,
+    ]);
+
+    return redirect()->route('ticket.show', $id)->with('success', 'Comment added!');
+})->name('comments.store');
+
+Route::get('/ticket/{id}', function ($id) {
+    $ticket = Ticket::with('user')->findOrFail($id);
+    $comments = Comment::where('ticket_id', $id)->orderBy('created_at')->get();
+
+    return view('ticket.show', compact('ticket', 'comments'));
+})->name('ticket.show');
 
 // Make the login page the landing page
 Route::get('/', function () {

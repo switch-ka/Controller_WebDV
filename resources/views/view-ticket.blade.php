@@ -31,9 +31,8 @@
 
                                 <!-- Add a link to the ticket's detail page -->
                                 <td>
-                                    
-                                        {{ $ticket['title'] }}
-                                    
+                                    <!-- Add href link to ticket details -->
+                                    <a href="{{ url('/ticket/'.$ticket->id) }}">{{ $ticket['title'] }}</a>
                                 </td>
 
                                 <td class="status-{{ strtolower(str_replace(' ', '-', $ticket['status'])) }}">
@@ -51,15 +50,14 @@
                                 @if (session('user_type') === 'admin')
                                     <td>
                                     <form action="{{ route('ticket.update-status', $ticket['id']) }}" method="POST" id="status-form-{{ $ticket['id'] }}">
-    @csrf
-    @method('PUT')
-    <select name="status" onchange="document.getElementById('status-form-{{ $ticket['id'] }}').submit()" required>
-        <option value="open" {{ $ticket['status'] === 'open' ? 'selected' : '' }}>Open</option>
-        <option value="pending" {{ $ticket['status'] === 'pending' ? 'selected' : '' }}>Pending</option>
-        <option value="closed" {{ $ticket['status'] === 'closed' ? 'selected' : '' }}>Closed</option>
-    </select>
-</form>
-
+                                        @csrf
+                                        @method('PUT')
+                                        <select name="status" onchange="document.getElementById('status-form-{{ $ticket['id'] }}').submit()" required>
+                                            <option value="open" {{ $ticket['status'] === 'open' ? 'selected' : '' }}>Open</option>
+                                            <option value="pending" {{ $ticket['status'] === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="closed" {{ $ticket['status'] === 'closed' ? 'selected' : '' }}>Closed</option>
+                                        </select>
+                                    </form>
                                     </td>
                                 @endif
                             </tr>

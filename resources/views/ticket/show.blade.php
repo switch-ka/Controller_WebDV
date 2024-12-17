@@ -2,28 +2,37 @@
 
 @section('content')
     <div class="container">
-        <h1>Ticket #{{ $ticket->id }} - {{ $ticket->subject }}</h1>
-        <p>{{ $ticket->description }}</p>
+        <h1 class="text-center mt-4">Ticket Details</h1>
 
-        <h3>Feedback Messages</h3>
-        @foreach($feedbacks as $feedback)
-            <div class="feedback-message">
-                <strong>{{ $feedback->user->name }}</strong> ({{ $feedback->created_at->diffForHumans() }}):
-                <p>{{ $feedback->message }}</p>
-            </div>
-        @endforeach
-
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+        @if(session('error'))
+            <div class="alert alert-danger text-center">
+                {{ session('error') }}
             </div>
         @endif
 
-        <!-- Form to submit new feedback -->
-        <form action="{{ route('feedback.store', $ticket->id) }}" method="POST">
-            @csrf
-            <textarea name="message" rows="4" placeholder="Write your feedback..." required></textarea>
-            <button type="submit" class="btn btn-primary">Send Feedback</button>
-        </form>
+        @if($ticket)
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>{{ $ticket->title }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Description:</strong> {{ $ticket->description }}</p>
+            <p><strong>Status:</strong> {{ ucfirst($ticket->status) }}</p>
+            <p><strong>Sender:</strong>
+                @if($ticket->user)
+                    {{ $ticket->user->username }}  <!-- Ensure to use the correct field, e.g., 'username' -->
+                @else
+                    No Sender
+                @endif
+            </p>
+        </div>
+    </div>
+@else
+    <div class="alert alert-warning mt-4">
+        Ticket not found.
+    </div>
+@endif
+
+
     </div>
 @endsection

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\TicketDetail;
 
 use App\Models\Ticket;  // Ensure you have this model
 use Illuminate\Http\Request;
@@ -93,6 +94,20 @@ class TicketController extends Controller
         // Redirect back with a success message
         return back()->with('success', 'Ticket status updated successfully!');
     }
+
+
+    public function showTicketDetails($ticketId)
+    {
+        $ticket = Ticket::with('user')->find($ticketId);
+    
+        if (!$ticket) {
+            return redirect()->route('ticket.index')->with('error', 'Ticket not found');
+        }
+    
+        return view('ticket.details', compact('ticket'));  // Ensure ticket is being passed correctly
+    }
+    
+    
     
 
     // Method to show a ticket (admin or user) without comments
