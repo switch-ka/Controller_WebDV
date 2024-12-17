@@ -98,7 +98,8 @@ class AuthController extends Controller
     
 
     // Handle Admin login
-    public function loginAdmin(Request $request)
+    // Handle Admin login
+public function loginAdmin(Request $request)
 {
     // Validate the incoming request data
     $validated = $request->validate([
@@ -109,22 +110,23 @@ class AuthController extends Controller
     // Fetch the user from the database
     $user = User::where('username', $validated['username'])->first();
 
-    // Check if the user exists and if the password matches
-    if (!$user || $user->password !== $validated['password']) {
-        return redirect()->back()->with('error', 'Invalid credentials');
+    // Check if the user exists and the role is 'admin'
+    if (!$user || $user->role !== 'admin') {
+        return redirect()->back()->with('error', 'Unauthorized access. Admins only.');
     }
 
-    // Check if the user has an 'admin' role
-    if ($user->role !== 'admin') {
-        return redirect()->back()->with('error', 'You are not authorized to log in as an admin');
+    // Check if the password matches
+    if ($user->password !== $validated['password']) {
+        return redirect()->back()->with('error', 'Invalid credentials.');
     }
 
     // Store user information in the session
     session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
 
-    // Redirect to the admin's ticketing system or another admin page
-    return redirect()->route('view-ticket');
+    // Redirect the admin to the ticketing system
+    return redirect()->route('view-ticket')->with('success', 'Welcome, Admin!');
 }
+
 
     // Handle logout
     public function logout()

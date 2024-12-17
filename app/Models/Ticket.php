@@ -2,15 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    use HasFactory;
+    // Define the relationship with the User model
+    public function user()
+    {
+        return $this->belongsTo(User::class);  // Assuming 'User' is the model name for users
+    }
 
-    // Define the fillable fields
-    protected $fillable = ['title', 'status', 'description', 'user_id'];
-
-    // Optionally, if you want to define relationships, add them here.
+    // Relationship to the comments model
+    // app/Models/Ticket.php
+public function comments()
+{
+    return $this->hasMany(Comment::class);
 }
+public function feedbacks()
+{
+    return $this->hasMany(Feedback::class);
+}
+
+
+}
+

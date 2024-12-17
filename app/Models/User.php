@@ -44,4 +44,9 @@ class User extends Authenticatable
             // Removed password casting to 'hashed'
         ];
     }
+    public function feedbacks()
+{
+    return $this->hasMany(Feedback::class);
+}
+
 }

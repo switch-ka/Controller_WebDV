@@ -18,8 +18,11 @@ class CheckUserType
     public function handle(Request $request, Closure $next, $type)
     {
         if (session('user_type') !== $type) {
+            \Log::info('User type mismatch or not found.');
             return redirect()->route('login');
         }
+    
         return $next($request);
     }
+    
 }
