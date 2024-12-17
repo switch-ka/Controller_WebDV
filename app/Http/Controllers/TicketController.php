@@ -1,25 +1,50 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\TicketDetail;
 
-use App\Models\Ticket;  // Ensure you have this model
+use App\Models\TicketDetail;
+use App\Models\Message;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;  // Add this line to use Log
 
 class TicketController extends Controller
 {
     // Method to show the form for creating a new ticket
     public function create()
     {
-        return view('create-ticket'); // Make sure this view exists
+        return view('create-ticket');
     }
+
+    public function addMessage(Request $request, $ticketId)
+    {
+        $ticket = Ticket::findOrFail($ticketId);
+    
+        // Create a new message
+        $message = new Message();
+        $message->ticket_id = $ticket->id;
+        $message->user_id = auth()->id();  // Ensure the message is linked to the authenticated user
+        $message->message = $request->message;
+        $message->save();
+    
+        Log::info('Message saved', ['message' => $message]); // Log the message being saved
+    
+        return redirect()->route('ticket.show', $ticketId)->with('success', 'Message added successfully!');
+    }
+    
+
+   
+
+    
+
+    
 
     // Method to view ticket details (without comments)
     public function viewTicketDetails($id)
     {
         // Fetch the ticket with its associated user (no comments)
         $ticket = Ticket::with('user')->findOrFail($id);
-    
+
         // Return the ticket details view with the ticket data
         return view('tickets.view-ticket-details', compact('ticket'));
     }
@@ -90,36 +115,37 @@ class TicketController extends Controller
         // Update the status
         $ticket->status = $request->input('status');
         $ticket->save();
+        Log::info('Test log entry');
 
         // Redirect back with a success message
         return back()->with('success', 'Ticket status updated successfully!');
     }
 
-
+    // Method to show ticket details with related messages
     public function showTicketDetails($ticketId)
     {
-        $ticket = Ticket::with('user')->find($ticketId);
+        $ticket = Ticket::with('messages.user')->find($ticketId);
+    
+        dd($ticket);  // Check the ticket and messages
     
         if (!$ticket) {
             return redirect()->route('ticket.index')->with('error', 'Ticket not found');
         }
     
-        return view('ticket.details', compact('ticket'));  // Ensure ticket is being passed correctly
+        return view('ticket.details', compact('ticket'));
     }
     
-    
-    
 
+    
     // Method to show a ticket (admin or user) without comments
     public function show($ticketId)
-{
-    // Find the ticket by ID
-    $ticket = Ticket::findOrFail($ticketId);
-    
-    // Optionally, load feedbacks or related information
-    $feedbacks = $ticket->feedbacks; 
+    {
+        // Find the ticket by ID
+        $ticket = Ticket::findOrFail($ticketId);
+        
+        // Optionally, load feedbacks or related information
+        $feedbacks = $ticket->feedbacks; 
 
-    return view('ticket.details', compact('ticket', 'feedbacks'));
-}
-
+        return view('ticket.details', compact('ticket', 'feedbacks'));
+    }
 }

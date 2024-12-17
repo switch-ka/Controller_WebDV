@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'cookie'),  // or 'file' for file-based sessions
+    'driver' => env('SESSION_DRIVER', 'file'),  // or 'file' for file-based sessions
 
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +32,8 @@ return [
     |
     */
 
-    'lifetime' => 120,
+    'lifetime' => env('SESSION_LIFETIME', 120),
+
 
     'expire_on_close' => false,
 

@@ -4,11 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Ticket;
+use App\Models\MessageV2;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 
-
-
+// Route to view a ticket's details
 Route::get('/ticket/{id}', function ($id) {
     $ticket = Ticket::find($id);
     if (!$ticket) {
@@ -17,6 +17,28 @@ Route::get('/ticket/{id}', function ($id) {
     return view('ticket.view', compact('ticket'));
 });
 
+Route::get('/ticket/{ticketId}', [TicketController::class, 'showTicketDetails'])->name('ticket.show');
+
+// Removed the auth middleware here, so this route is now open to everyone
+Route::post('/ticket/{ticketId}/message', function (Request $request, $ticketId) {
+    $request->validate([
+        'message' => 'required|string',
+    ]);
+
+    // Check if the user is logged in, if not set user_id to null for guest
+    $userId = auth()->check() ? auth()->id() : null;
+
+    // Add message to the ticket using the MessageV2 model
+    $ticket = Ticket::findOrFail($ticketId);
+    $ticket->messagesV2()->create([  // Ensure this uses the messagesV2() relationship
+        'user_id' => $userId,  // Either the authenticated user ID or null for guest
+        'content' => $request->message,
+    ]);
+
+    return redirect()->route('ticket.show', $ticketId)->with('success', 'Message added successfully!');
+})->name('ticket.addMessage');
+
+// Route to store comments for tickets
 Route::post('/ticket/{id}/comments', function (Request $request, $id) {
     $request->validate(['content' => 'required']);
 
@@ -29,6 +51,7 @@ Route::post('/ticket/{id}/comments', function (Request $request, $id) {
     return redirect()->route('ticket.show', $id)->with('success', 'Comment added!');
 })->name('comments.store');
 
+// Route for viewing the ticket details
 Route::get('/ticket/{id}', function ($id) {
     $ticket = Ticket::with('user')->findOrFail($id);
     $comments = Comment::where('ticket_id', $id)->orderBy('created_at')->get();
@@ -41,8 +64,25 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Route to show individual ticket details
-Route::get('/ticket/{ticket}', [TicketController::class, 'show'])->name('ticket.show');
+// New route for sending a message (using the MessageV2 model)
+Route::post('/ticket/{ticketId}/message-v2', function (Request $request, $ticketId) {
+    $request->validate([
+        'message' => 'required|string',
+    ]);
+
+    // Get user_id (if authenticated) or set as null for guest
+    $userId = auth()->check() ? auth()->id() : null;
+
+    // Add message to the ticket
+    $ticket = Ticket::findOrFail($ticketId);
+    $ticket->messagesV2()->create([  // Use messagesV2() relationship
+        'user_id' => $userId,  // Either the authenticated user ID or null for guest
+        'content' => $request->message,
+    ]);
+
+    return redirect()->route('ticket.show', $ticketId)->with('success', 'Message added successfully!');
+})->name('ticket.addMessageV2');
+
 
 // Route to store feedback (user submitting a new message)
 Route::post('/feedback/{ticket}', [FeedbackController::class, 'store'])->name('feedback.store');
@@ -52,7 +92,8 @@ Route::get('/create-ticket', [TicketController::class, 'create'])
     ->name('create-ticket')
     ->middleware('role:user');
 
-    Route::put('/ticket/{id}/update-status', [TicketController::class, 'updateStatus'])
+// Route to update ticket status - restricted to users with 'admin' role
+Route::put('/ticket/{id}/update-status', [TicketController::class, 'updateStatus'])
     ->name('ticket.update-status')
     ->middleware('role:admin');
 

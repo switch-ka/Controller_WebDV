@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Log; 
 
 class AuthController extends Controller
 {
@@ -60,10 +61,14 @@ class AuthController extends Controller
         }
 
         // Store user information in the session
-        session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
+session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
 
-        // Redirect user based on their role (user/admin)
-        return redirect()->route('view-ticket');
+// Log session data after login
+Log::info('User logged in, session data: ', session()->all());
+
+// Redirect user based on their role (user/admin)
+return redirect()->route('view-ticket');
+
     }
 
     // Handle User registration
@@ -130,8 +135,13 @@ public function loginAdmin(Request $request)
 
     // Handle logout
     public function logout()
-    {
-        session()->flush(); // Clear session data
-        return redirect()->route('login'); // Redirect to login page
-    }
+{
+    Log::info('User logging out, clearing session data');
+    session()->flush(); // Clear session data
+
+    // Log session data after logout
+    Log::info('Session data after logout: ', session()->all());
+
+    return redirect()->route('login'); // Redirect to login page
+}
 }
