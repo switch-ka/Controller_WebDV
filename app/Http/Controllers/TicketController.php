@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\TicketDetail;
 use App\Models\Message;
+
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;  // Add this line to use Log
@@ -16,36 +15,11 @@ class TicketController extends Controller
         return view('create-ticket');
     }
 
-    public function addMessage(Request $request, $ticketId)
-    {
-        $ticket = Ticket::findOrFail($ticketId);
-    
-        // Create a new message
-        $message = new Message();
-        $message->ticket_id = $ticket->id;
-        $message->user_id = auth()->id();  // Ensure the message is linked to the authenticated user
-        $message->message = $request->message;
-        $message->save();
-    
-        Log::info('Message saved', ['message' => $message]); // Log the message being saved
-    
-        return redirect()->route('ticket.show', $ticketId)->with('success', 'Message added successfully!');
-    }
-    
-
-   
-
-    
-
-    
-
     // Method to view ticket details (without comments)
     public function viewTicketDetails($id)
     {
-        // Fetch the ticket with its associated user (no comments)
-        $ticket = Ticket::with('user')->findOrFail($id);
-
-        // Return the ticket details view with the ticket data
+        $ticket = Ticket::with(['user', 'messages.user'])->findOrFail($id);  // Load messages with user data
+    
         return view('tickets.view-ticket-details', compact('ticket'));
     }
 
@@ -120,23 +94,36 @@ class TicketController extends Controller
         // Redirect back with a success message
         return back()->with('success', 'Ticket status updated successfully!');
     }
+    public function addMessage(Request $request, $ticketId)
+{
+    $request->validate([
+        'message' => 'required|string|max:1000',
+    ]);
+
+    // Store the new message
+    $message = new Message();
+    $message->ticket_id = $ticketId;
+    $message->user_id = session('user_id'); // assuming the user ID is in the session
+    $message->message = $request->message;
+    $message->save();
+
+    return back()->with('success', 'Message sent successfully!');
+}
 
     // Method to show ticket details with related messages
-    public function showTicketDetails($ticketId)
+    public function showTicket($ticketId)
     {
+        // Eager load messages with the associated user
         $ticket = Ticket::with('messages.user')->find($ticketId);
     
-        dd($ticket);  // Check the ticket and messages
-    
         if (!$ticket) {
-            return redirect()->route('ticket.index')->with('error', 'Ticket not found');
+            return redirect()->route('tickets.index')->with('error', 'Ticket not found.');
         }
     
-        return view('ticket.details', compact('ticket'));
+        return view('ticket.show', compact('ticket'));
     }
     
 
-    
     // Method to show a ticket (admin or user) without comments
     public function show($ticketId)
     {

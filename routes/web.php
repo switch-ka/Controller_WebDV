@@ -17,7 +17,7 @@ Route::get('/ticket/{id}', function ($id) {
     return view('ticket.view', compact('ticket'));
 });
 
-Route::get('/ticket/{ticketId}', [TicketController::class, 'showTicketDetails'])->name('ticket.show');
+Route::post('/tickets/{id}/add-message', [TicketController::class, 'addMessage'])->name('ticket.add-message');
 
 // Removed the auth middleware here, so this route is now open to everyone
 Route::post('/ticket/{ticketId}/message', function (Request $request, $ticketId) {

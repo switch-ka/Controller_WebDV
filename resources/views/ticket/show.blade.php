@@ -32,20 +32,19 @@
                         @endif
                     </p>
 
-                    <!-- Display the messages related to the ticket -->
-                    <div class="messages mt-4">
-                        <h5>Messages:</h5>
-                        @if($ticket->messagesV2->count() > 0)
-                        @foreach($ticket->messagesV2 as $message)
-    <div class="message mb-3">
-        <p><strong>{{ $message->username }}:</strong> {{ $message->content }}</p>
-        <p><small>Sent at: {{ $message->created_at->format('Y-m-d H:i:s') }}</small></p>
-    </div>
-@endforeach
-
-
-                        @else
+                    <!-- Display Ticket Messages -->
+                    <h4>Messages:</h4>
+                    <div class="messages">
+                        @if($ticket->messages->isEmpty())
                             <p>No messages yet.</p>
+                        @else
+                            @foreach ($ticket->messages as $message)
+                                <div class="message">
+                                <p><strong>{{ $message->user->username }}</strong> ({{ $message->created_at->format('Y-m-d H:i') }}):</p>
+<p>{{ $message->message }}</p>
+
+                                </div>
+                            @endforeach
                         @endif
                     </div>
 
