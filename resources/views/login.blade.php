@@ -6,26 +6,6 @@
     <title>User Login</title>
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <style>
-        .toggle-box {
-            margin-top: 20px;
-            display: block;
-        }
-        .toggle-panel {
-            text-align: center;
-        }
-        .toggle-box .btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: lightblue;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .toggle-box .btn:hover {
-            background-color: darkblue;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -65,7 +45,7 @@
             </form>
         </div>
 
-        <!-- Toggle Button to Switch Between User and Admin Login -->
+        <!-- Toggle Box -->
         <div class="toggle-box">
             <div class="toggle-panel toggle-left">
                 <h1>Hello, Welcome!</h1>
@@ -76,26 +56,25 @@
     </div>
 
     <script>
-        // Function to switch between User and Admin login
         function toggleLogin() {
-            const userLogin = document.getElementById('user-login');
-            const adminLogin = document.getElementById('admin-login');
-            const toggleButton = document.querySelector('.register-btn');
-            const title = document.querySelector('title');
+    const userLogin = document.getElementById('user-login');
+    const adminLogin = document.getElementById('admin-login');
+    const toggleButton = document.querySelector('.register-btn');
+    const title = document.querySelector('title');
 
-            // Toggle the login forms
-            if (userLogin.style.display === 'none') {
-                userLogin.style.display = 'block';
-                adminLogin.style.display = 'none';
-                title.textContent = 'User Login'; 
-                toggleButton.textContent = 'Admin Login'; 
-            } else {
-                userLogin.style.display = 'none';
-                adminLogin.style.display = 'block';
-                title.textContent = 'Admin Login'; 
-                toggleButton.textContent = 'User Login'; 
-            }
-        }
+    if (userLogin.style.display === 'none') {
+        userLogin.style.display = 'flex'; // Switch back to user login
+        adminLogin.style.display = 'none';
+        title.textContent = 'User Login';
+        toggleButton.textContent = 'Admin Login';
+    } else {
+        userLogin.style.display = 'none';
+        adminLogin.style.display = 'flex'; // Switch to admin login
+        title.textContent = 'Admin Login';
+        toggleButton.textContent = 'User Login';
+    }
+}
+
     </script>
 </body>
 </html>

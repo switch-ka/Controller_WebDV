@@ -1,73 +1,75 @@
-<!-- resources/views/auth/register.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
 </head>
 <body>
-<form action="{{ route('register.submit') }}" method="POST">
-    @csrf
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required value="{{ old('username') }}">
+    <div class="container">
+        <div class="form-container">
+            <h1>Register</h1>
+            <form action="{{ route('register') }}" method="POST">
+                @csrf
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
 
-    @error('username')
-        <div>{{ $message }}</div>
-    @enderror
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required value="{{ old('email') }}">
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
 
-    @error('email')
-        <div>{{ $message }}</div>
-    @enderror
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="password_confirmation">Confirm Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm your password" required>
+                </div>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+                <!-- Role Selection -->
+                <div class="form-group">
+                    <label for="role">Select Role</label>
+                    <select id="role" name="role" required onchange="toggleAdminKey()">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
 
-    @error('password')
-        <div>{{ $message }}</div>
-    @enderror
+                <!-- Admin Key -->
+                <div class="form-group admin-key" id="admin-key-container" style="display: none;">
+                    <label for="admin_key">Admin Key</label>
+                    <input type="password" id="admin_key" name="admin_key" placeholder="Enter the admin key">
+                </div>
 
-    <label for="password_confirmation">Confirm Password:</label>
-    <input type="password" id="password_confirmation" name="password_confirmation" required>
+                <!-- Submit Button -->
+                <button type="submit" class="btn">Register</button>
 
-    <label for="role">Role:</label>
-    <select name="role" id="role" required>
-        <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-    </select>
-
-    @error('role')
-        <div>{{ $message }}</div>
-    @enderror
-
-    <!-- Admin Key container -->
-    <div id="admin-key-container" style="display: none;">
-        <label for="admin_key">Admin Key:</label>
-        <input type="text" id="admin_key" name="admin_key" value="{{ old('admin_key') }}" required>
-
-        @error('admin_key')
-            <div>{{ $message }}</div>
-        @enderror
+                <!-- Login Redirect -->
+                <p class="redirect">Already have an account? <a href="{{ route('login') }}">Login here</a>.</p>
+            </form>
+        </div>
     </div>
 
-    <button type="submit">Register</button>
-</form>
-
-<script>
-    document.getElementById('role').addEventListener('change', function() {
-        var adminKeyContainer = document.getElementById('admin-key-container');
-        if (this.value === 'admin') {
-            adminKeyContainer.style.display = 'block';
-        } else {
-            adminKeyContainer.style.display = 'none';
+    <script>
+        function toggleAdminKey() {
+            const role = document.getElementById('role').value;
+            const adminKeyContainer = document.getElementById('admin-key-container');
+            if (role === 'admin') {
+                adminKeyContainer.style.display = 'block';
+            } else {
+                adminKeyContainer.style.display = 'none';
+            }
         }
-    });
-
-    // Trigger the event on page load to show the correct admin key field state
-    document.getElementById('role').dispatchEvent(new Event('change'));
-</script>
+    </script>
 </body>
 </html>
