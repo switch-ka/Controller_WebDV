@@ -61,13 +61,13 @@ class AuthController extends Controller
         }
 
         // Store user information in the session
-session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
+        session(['user_id' => $user->id, 'user_type' => $user->role, 'username' => $user->username]);
 
-// Log session data after login
-Log::info('User logged in, session data: ', session()->all());
+        // Log session data after login
+        Log::info('User logged in, session data: ', session()->all());
 
-// Redirect user based on their role (user/admin)
-return redirect()->route('view-ticket');
+        // Redirect user based on their role (user/admin)
+        return redirect()->route('view-ticket');
 
     }
 
