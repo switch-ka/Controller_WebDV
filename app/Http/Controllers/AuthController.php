@@ -73,32 +73,30 @@ return redirect()->route('view-ticket');
 
     // Handle User registration
     public function register(Request $request)
-    {
-        // Validate incoming data
-        $validated = $request->validate([
-            'username' => 'required|unique:users,username',
-            'password' => 'required|min:6',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:user,admin',  // Ensure only user or admin is allowed
-            'admin_key' => 'required_if:role,admin|in:admin_secret_key', // Admin key validation only if role is 'admin'
-        ]);
-    
-        // If the role is 'admin' and the admin_key is not correct
-        if ($validated['role'] === 'admin' && $validated['admin_key'] !== 'admin_secret_key') {
-            return back()->with('error', 'Invalid admin key');
-        }
-    
-        // Create a new user instance
-        $user = new User();
-        $user->username = $validated['username'];  // Assign username
-        $user->password = $validated['password'];  // Use plain text password
-        $user->role = $validated['role'];  // Assign role (user or admin)
-        $user->email = $validated['email'];  // Assign email
-        $user->save();  // Save to the database
-    
-        // Return success message and redirect to login page
+{
+    // Validate input
+    $validated = $request->validate([
+        'username' => 'required|string|unique:users,username',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|confirmed|min:6',
+        'role' => 'required|string',
+    ]);
+
+    // Hash password
+    $validated['password'] = ($validated['password']);
+
+    // Save user
+    $user = User::create($validated);
+
+    // Check if the user was successfully created
+    if ($user->wasRecentlyCreated) {
         return redirect()->route('login')->with('success', 'User registered successfully!');
     }
+
+    return back()->withErrors(['registration' => 'Failed to register the user.']);
+}
+
+    
    
     
 
